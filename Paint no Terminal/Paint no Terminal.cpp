@@ -49,7 +49,7 @@ int main(void){
 }
 
 
-int Comandos(int *retorno){
+int Comandos(int *retorno){  //Seleciona o comando
 	
 	int i,j,aux;
 	char cmd[30];
@@ -69,7 +69,7 @@ int Comandos(int *retorno){
 	if(cmd[0] == 'C' && cmd[1] == 'R' && cmd[2] == 'E' && cmd[3] == 'A' && cmd[4] == 'T' && cmd[5] == 'E'){		//CREATE
 		
 		for(i=0,j=0;i!=30;i++){
-			if(cmd[i]>=48 && cmd[i]<=57){							//48 e 57 são os estremos de 0 a 9 na tabala ASCII
+			if(cmd[i]>=48 && cmd[i]<=57){	//48 e 57 são os estremos de 0 a 9 na tabala ASCII
 				retorno[j] = cmd[i] - 48;
 				j++;
 			}
@@ -121,13 +121,10 @@ int Comandos(int *retorno){
 	}
 }
 
-void Create(int *dimensoes){
+void Create(int *dimensoes){	//Cria a imagem PGM
 	int aux,i;
 	int width=0,heigth=0;  
 		
-	//for(i=0;i!=6;i++){
-	//	printf("dem[%d] = %d\n",i,dimensoes);
-	//}	
 		
 	for(i=0,aux=100;i!=3;i++){
 		width = width + dimensoes[i]*aux;
