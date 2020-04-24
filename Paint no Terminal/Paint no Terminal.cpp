@@ -6,7 +6,8 @@
 #define ERRO -1
 
 int Comandos(int *retorno);			//Le o comando digitado
-void Create(int *dimensoes);		//Cria a imagem PBM
+void Create(int *dimensoes);			//Cria a imagem PBM
+
 
 int main(void){
 	int cmd[30];
