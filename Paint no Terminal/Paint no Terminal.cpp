@@ -27,7 +27,7 @@ int main(void){
 			
 			
 			case 2:
-				
+			
 				break;
 			
 			
@@ -61,8 +61,8 @@ int Comandos(int *retorno,char *nome, int *info){  //Seleciona o comando
 	int caracter;
 	
 	
-	for(i=0;i!=30;i++)
-		cmd[i] = ' ';
+//	for(i=0;i!=30;i++)
+//		cmd[i] = ' ';
 	
 	
 	printf("Digite o Comando: ");
@@ -84,8 +84,12 @@ int Comandos(int *retorno,char *nome, int *info){  //Seleciona o comando
 	
 	if(cmd[0] == 'E' && cmd[1] == 'X' && cmd[2] == 'P' && cmd[3] == 'O' && cmd[4] == 'R' && cmd[5] == 'T'){		//EXPORT
 
-		
-	
+		for(i=7,j=0;i!=30;i++){
+			cmd[i] = nome[j];
+			j++;
+		}
+		strcat (nome, ".pgm");
+		*info = 1;
 		return 2;
 	}
 	
@@ -148,7 +152,7 @@ void Create(int *dimensoes,char *nome, int *info){		//Cria a imagem PGM
 		strcat (nome, ".pgm");
 	}
 
-
+	printf("%s\n",nome);
 	
 	FILE *arquivo = fopen (nome,"w");
 
