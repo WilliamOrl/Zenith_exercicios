@@ -5,20 +5,22 @@
 #define SUCESSO 1
 #define ERRO -1
 
-int Comandos(int *retorno);			//Le o comando digitado
-void Create(int *dimensoes);			//Cria a imagem PBM
+int Comandos(int *retorno,char *nome, int *info);					//Le o comando digitado
+void Create(int *dimensoes,char *nome, int *info);			//Cria a imagem PBM
 
 
 int main(void){
-	int cmd[30];
-	int aux;
+	int cmdint[30];
+	char cmdchar[30];
+	int aux,info;
+	info = 0;
 	
 	while(1){
-		aux = Comandos(cmd);
+		aux = Comandos(cmdint,cmdchar,&info);
 		switch(aux){
 			
 			case 1:
-			Create(cmd);
+			Create(cmdint,cmdchar,&info);
 				break;
 			
 			
@@ -50,7 +52,7 @@ int main(void){
 }
 
 
-int Comandos(int *retorno){  //Seleciona o comando
+int Comandos(int *retorno,char *nome, int *info){  //Seleciona o comando
 	
 	int i,j,aux;
 	char cmd[30];
@@ -75,15 +77,13 @@ int Comandos(int *retorno){  //Seleciona o comando
 				j++;
 			}
 		}
+		*info = 1;
 		return 1;
 	}
 	
 	if(cmd[0] == 'E' && cmd[1] == 'X' && cmd[2] == 'P' && cmd[3] == 'O' && cmd[4] == 'R' && cmd[5] == 'T'){		//EXPORT
 
-		for(i=4,j=0;i=30;i++,j++)
 		
-			cmd[i]= retorno[j];
-
 	
 		return 2;
 	}
@@ -122,11 +122,16 @@ int Comandos(int *retorno){  //Seleciona o comando
 	}
 }
 
-void Create(int *dimensoes){	//Cria a imagem PGM
-	int aux,i;
-	int width=0,heigth=0;  
-		
-		
+void Create(int *dimensoes,char *nome, int *info){		//Cria a imagem PGM
+	
+	int aux,i,j,branco = 255;
+	int width=0,heigth=0;
+	
+	if(*info == 1){
+		printf("A Imagem ainda esta sem Nome: ");
+		scanf("%s",&nome);
+	}
+	
 	for(i=0,aux=100;i!=3;i++){
 		width = width + dimensoes[i]*aux;
 		aux = aux/10;
@@ -136,6 +141,22 @@ void Create(int *dimensoes){	//Cria a imagem PGM
 		heigth = heigth + dimensoes[i]*aux;
 		aux = aux/10;
 	}
+	
+	strcat (nome, ".pgm");
+	FILE *arquivo = fopen (nome,"w");
+	
+	fprintf(arquivo, "P2\n");
+    fprintf(arquivo, "%d %d\n",width, heigth);
+    fprintf(arquivo, "255\n");
+	
+	for(i=0;i!=width;i++){
+		for(j=0;j!=heigth;j++){
+			fprintf(arquivo,"255");
+		}
+		fprintf(arquivo,"\n");
+	}
+	
+	fclose(arquivo);
 	
 	printf("width = %d\nheigth = %d\n",width,heigth);
 	return;
