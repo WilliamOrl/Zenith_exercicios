@@ -1,7 +1,8 @@
 //	Programa realizado durante o treinamento do Zenith 
 //	Hands-on Project 1 - Paint no Terminal
-#include<stdio.h>
-#include<string.h>
+#include <stdio.h>
+#include <stdlib.h> 
+#include <string.h>  
 #define SUCESSO 1
 #define ERRO -1
 
@@ -77,7 +78,6 @@ int Comandos(int *retorno,char *nome, int *info){  //Seleciona o comando
 				j++;
 			}
 		}
-		*info = 1;
 		return 1;
 	}
 	
@@ -126,11 +126,8 @@ void Create(int *dimensoes,char *nome, int *info){		//Cria a imagem PGM
 	
 	int aux,i,j,branco = 255;
 	int width=0,heigth=0;
-	
-	if(*info == 1){
-		printf("A Imagem ainda esta sem Nome: ");
-		scanf("%s",&nome);
-	}
+	char nomeinterno[30];
+
 	
 	for(i=0,aux=100;i!=3;i++){
 		width = width + dimensoes[i]*aux;
@@ -142,22 +139,33 @@ void Create(int *dimensoes,char *nome, int *info){		//Cria a imagem PGM
 		aux = aux/10;
 	}
 	
-	strcat (nome, ".pgm");
+	
+	if(*info == 0){
+		printf("Selecione um nome para a imagem: ");
+		scanf("%s", &nome);
+		//setbuf(stdin, NULL);
+		//for(i=0;i!=30;i++);
+		//	nomeinterno[i] = nome[i];
+		*strcat (nome, ".pgm");
+	}
+	printf("%s\n",nome);
+
+	
 	FILE *arquivo = fopen (nome,"w");
-	
+
 	fprintf(arquivo, "P2\n");
-    fprintf(arquivo, "%d %d\n",width, heigth);
-    fprintf(arquivo, "255\n");
+    fprintf(arquivo, "%d %d\n",heigth,width);
+	fprintf(arquivo, "255\n");
 	
-	for(i=0;i!=width;i++){
-		for(j=0;j!=heigth;j++){
+	for(i=0;i!=heigth;i++){
+		for(j=0;j!=width;j++){
 			fprintf(arquivo,"255");
 		}
 		fprintf(arquivo,"\n");
 	}
-	
+
 	fclose(arquivo);
-	
+
 	printf("width = %d\nheigth = %d\n",width,heigth);
 	return;
 }
