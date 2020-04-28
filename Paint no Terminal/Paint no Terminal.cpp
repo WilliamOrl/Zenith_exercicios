@@ -14,6 +14,7 @@ int main(void){
 	int cmdint[30];
 	char cmdchar[30];
 	int aux,info;
+	cmdchar[30] = NULL;
 	info = 0;
 	
 	while(1){
@@ -142,13 +143,11 @@ void Create(int *dimensoes,char *nome, int *info){		//Cria a imagem PGM
 	
 	if(*info == 0){
 		printf("Selecione um nome para a imagem: ");
-		scanf("%s", &nome);
-		//setbuf(stdin, NULL);
-		//for(i=0;i!=30;i++);
-		//	nomeinterno[i] = nome[i];
-		*strcat (nome, ".pgm");
+		scanf("%[^\n]s",nome);
+		setbuf(stdin, NULL);
+		strcat (nome, ".pgm");
 	}
-	printf("%s\n",nome);
+
 
 	
 	FILE *arquivo = fopen (nome,"w");
