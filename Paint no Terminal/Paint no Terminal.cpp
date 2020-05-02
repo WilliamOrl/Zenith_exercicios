@@ -17,7 +17,7 @@ typedef struct{						//Elementos nescessarios para a criação de uma imagem tipo 
 int Comandos(int *retorno,char *nome);					//Le os comandos digitados
 void Create(int *dimensoes,Imagem *pixels);				//Cria a imagem PGM
 void Export(char *nome, Imagem *pixels);				//Salva a imagem
-void Line(int *dados, Imagem *pixels);					//Cria uma linha
+void Line(int *dados, Imagem *pixels);		//Cria uma linha
 
 int main(void){
 	Imagem pixels;
@@ -151,7 +151,6 @@ int Comandos(int *retorno,char *nome){  //Seleciona o comando
 	}
 }
 
-
 //=========================================================================
 //								CREATE
 //=========================================================================
@@ -206,6 +205,7 @@ void Export(char *nome, Imagem *pixels){
 	printf("Salvando Imagem...\n");
 	strcat (nome, ".pgm");
 	
+	
 	FILE *arquivo = fopen (nome,"w");
 
 	fprintf(arquivo,"%s\n",pixels->magic_number);
@@ -220,15 +220,22 @@ void Export(char *nome, Imagem *pixels){
 	}
 
 	fclose(arquivo);
+	
 	return;
 }
 
+
+//=========================================================================
+//								LINE
+//=========================================================================
+
 void Line(int *dados, Imagem *pixels){
 	
-	int x1,x2,y1,y2,color;
-	int m;			// Coeficiente da reta;
-	int c;			// Termo independente
-	int i;
+	float x1,x2,y1,y2;
+	int color;
+	float  m;				// Coeficiente da reta;
+	float c;	    			// Termo independente
+	int x,y; 
 	
 	x1 = dados[0];
 	y1 = dados[1];
@@ -236,14 +243,34 @@ void Line(int *dados, Imagem *pixels){
 	y2 = dados[3];	
 	color = dados[4];
 	
-	m = (y2-y1)/(x2-x1);
-	c = y1 - m*x1; 
+	printf("Desenhando a Linha...\n");
+	
+	if( (color>=0 && color<=255) && (x1>=0 && x1<=pixels->width) && (x2>=0 && x2<=pixels->width) && (y1>=0 && y1<=pixels->heigth) && (y2>=0 && y2<=pixels->heigth) && (x1 != x2)){
+	
+	m  = (y2-y1)/(x2-x1);
+	c  = y1 - m*x1; 
+	
 	 /*
 	for(i=0;i!=30;i++)
 		printf("vet[%d] = %d\n",i,dados[i]);
 	*/
-	printf("x1 = %d\ny1 = %d\nx2 = %d\ny2 = %d\ncolor = %d\n",x1,y1,x2,y2,color);
 	
-	printf("coeficiente = %d\ntermo independente = %d\n",m,c);
-	return;
+//	printf("x1 = %f\ny1 = %f\nx2 = %f\ny2 = %f\ncolor = %d\n",x1,y1,x2,y2,color);
+//	printf("coeficiente = %f\ntermo independente = %f\n",m,c);
+	
+	
+	for(y=0;y!=pixels->heigth;y++){
+		//y = m*x + c;
+		x = (y-c)/m;
+		if(x>=0 && x<=pixels->width){
+			pixels->imagem[y][x] = color;
+			}
+	}
+	
+	return;	
+	}else 
+		printf("ERRO!\n");
+		return;
+	
+	
 }
