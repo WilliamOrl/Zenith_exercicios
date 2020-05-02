@@ -14,8 +14,8 @@ typedef struct{						//Elementos nescessarios para a criação de uma imagem tipo 
 }Imagem;
 
 
-int Comandos(int *retorno,char *nome);					//Le o comando digitado
-void Create(int *dimensoes,Imagem *pixels);				//Cria a imagem PBM
+int Comandos(int *retorno,char *nome);					//Le os comandos digitados
+void Create(int *dimensoes,Imagem *pixels);				//Cria a imagem PGM
 void Export(char *nome, Imagem *pixels);				//Salva a imagem
 void Line(int *dados, Imagem *pixels);					//Cria uma linha
 
@@ -40,7 +40,7 @@ int main(void){
 			
 			
 			case 3:
-			//Line(cmdint,&pixels);
+			Line(cmdint,&pixels);
 				break;
 			
 			
@@ -111,7 +111,7 @@ int Comandos(int *retorno,char *nome){  //Seleciona o comando
 	
 	if(cmd[0] == 'L' && cmd[1] == 'I' && cmd[2] == 'N' && cmd[3] == 'E'){		//LINE
 		
-		for(i=4,j=0;i!=30;i++){
+		for(i=5,j=0;i!=30;i++){
 			if(cmd[i]>=48 && cmd[i]<=57 || cmd[i] == ' ' ){					//48 e 57 são os estremos de 0 a 9 na tabala ASCII
 				if(cmd[i] == ' '){
 					j++;
@@ -226,12 +226,24 @@ void Export(char *nome, Imagem *pixels){
 void Line(int *dados, Imagem *pixels){
 	
 	int x1,x2,y1,y2,color;
+	int m;			// Coeficiente da reta;
+	int c;			// Termo independente
+	int i;
 	
 	x1 = dados[0];
 	y1 = dados[1];
-	x2 = dados[3];
-	y2 = dados[4];	
-	color = dados[5];
+	x2 = dados[2];
+	y2 = dados[3];	
+	color = dados[4];
 	
+	m = (y2-y1)/(x2-x1);
+	c = y1 - m*x1; 
+	 /*
+	for(i=0;i!=30;i++)
+		printf("vet[%d] = %d\n",i,dados[i]);
+	*/
+	printf("x1 = %d\ny1 = %d\nx2 = %d\ny2 = %d\ncolor = %d\n",x1,y1,x2,y2,color);
 	
+	printf("coeficiente = %d\ntermo independente = %d\n",m,c);
+	return;
 }
