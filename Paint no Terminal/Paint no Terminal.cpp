@@ -5,7 +5,7 @@
 #include <string.h>  
 
 
-typedef struct{
+typedef struct{						//Elementos nescessarios para a criação de uma imagem tipo PGM
 	char magic_number[3];
 	int heigth;
 	int width;
@@ -17,6 +17,7 @@ typedef struct{
 int Comandos(int *retorno,char *nome);					//Le o comando digitado
 void Create(int *dimensoes,Imagem *pixels);				//Cria a imagem PBM
 void Export(char *nome, Imagem *pixels);				//Salva a imagem
+void Line(int *dados, Imagem *pixels);					//Cria uma linha
 
 int main(void){
 	Imagem pixels;
@@ -39,7 +40,7 @@ int main(void){
 			
 			
 			case 3:
-				
+			//Line(cmdint,&pixels);
 				break;
 			
 			
@@ -60,13 +61,21 @@ int main(void){
 	}
 }
 
+//=========================================================================
+//								COMANDOS
+//=========================================================================
+
 
 int Comandos(int *retorno,char *nome){  //Seleciona o comando
 	
-	int i,j,aux;
+	int i,j,aux=0;
 	char cmd[30];
 	int caracter;
 	
+	for(i=0;i!=30;i++){
+		cmd[i] = ' ';
+		retorno[i] = 0;  
+	}
 		
 	printf("Digite o Comando: ");
 	scanf("%[^\n]s",&cmd);
@@ -76,10 +85,16 @@ int Comandos(int *retorno,char *nome){  //Seleciona o comando
 
 	if(cmd[0] == 'C' && cmd[1] == 'R' && cmd[2] == 'E' && cmd[3] == 'A' && cmd[4] == 'T' && cmd[5] == 'E'){		//CREATE
 		
-		for(i=0,j=0;i!=30;i++){
-			if(cmd[i]>=48 && cmd[i]<=57){	//48 e 57 são os estremos de 0 a 9 na tabala ASCII
-				retorno[j] = cmd[i] - 48;
-				j++;
+		for(i=7,j=0;i!=30;i++){
+			if(cmd[i]>=48 && cmd[i]<=57 || cmd[i] == ' ' ){					//48 e 57 são os estremos de 0 a 9 na tabala ASCII
+				if(cmd[i] == ' '){
+					j++;
+				}
+				else{
+					aux = cmd[i] - 48;
+					retorno[j] = retorno[j]*10;	
+					retorno[j] = retorno[j] + aux;
+				}
 			}
 		}
 		return 1;
@@ -96,10 +111,18 @@ int Comandos(int *retorno,char *nome){  //Seleciona o comando
 	
 	if(cmd[0] == 'L' && cmd[1] == 'I' && cmd[2] == 'N' && cmd[3] == 'E'){		//LINE
 		
-		for(i=4,j=0;i=30;i++,j++)
-		
-			cmd[i]= retorno[j];
-			
+		for(i=4,j=0;i!=30;i++){
+			if(cmd[i]>=48 && cmd[i]<=57 || cmd[i] == ' ' ){					//48 e 57 são os estremos de 0 a 9 na tabala ASCII
+				if(cmd[i] == ' '){
+					j++;
+				}
+				else{
+					aux = cmd[i] - 48;
+					retorno[j] = retorno[j]*10;	
+					retorno[j] = retorno[j] + aux;
+				}
+			}
+		}
 		return 3;
 	}
 	
@@ -128,6 +151,11 @@ int Comandos(int *retorno,char *nome){  //Seleciona o comando
 	}
 }
 
+
+//=========================================================================
+//								CREATE
+//=========================================================================
+
 void Create(int *dimensoes,Imagem *pixels){		//Cria a imagem PGM
 	
 	int i,j,aux;
@@ -135,18 +163,10 @@ void Create(int *dimensoes,Imagem *pixels){		//Cria a imagem PGM
 	
 	printf("Criando Imagem...\n");
 	
-	for(i=0,aux=100;i!=3;i++){
-		width = width + dimensoes[i]*aux;
-		aux = aux/10;
-	}
-	
-	for(i=3,aux=100;i!=6;i++){
-		heigth = heigth + dimensoes[i]*aux;
-		aux = aux/10;
-	}
-	
-	
-	if(heigth>width){
+	width = dimensoes[0];
+	heigth = dimensoes[1];
+		
+	if(heigth>width || heigth == 0 || width == 0 || heigth > 2000 || width > 2000 ){
 		printf("ERRO!\n");
 		return;
 	}
@@ -155,6 +175,8 @@ void Create(int *dimensoes,Imagem *pixels){		//Cria a imagem PGM
 	pixels->magic_number[0] = 'P';
 	pixels->magic_number[1] = '2';
 	pixels->magic_number[2] = '\0';
+	
+	pixels->color = 255;
 
 	pixels->width = width;
 	pixels->heigth = heigth;
@@ -163,21 +185,31 @@ void Create(int *dimensoes,Imagem *pixels){		//Cria a imagem PGM
         for (int i = 0; i < heigth; i++){
             pixels->imagem[i] = (int *) calloc (width, sizeof(int));
         }
-		
-
+	
 	return;
 }
+
+
+//=========================================================================
+//								EXPORT
+//=========================================================================
 
 void Export(char *nome, Imagem *pixels){
 
 	int i,j;
 	
+	if(pixels->heigth == 0 || pixels->width == 0){
+		printf("ERRO!\n");
+		return;
+	}
+	
+	printf("Salvando Imagem...\n");
 	strcat (nome, ".pgm");
 	
 	FILE *arquivo = fopen (nome,"w");
 
 	fprintf(arquivo,"%s\n",pixels->magic_number);
-    fprintf(arquivo, "%d %d\n",pixels->heigth,pixels->width);
+    fprintf(arquivo, "%d %d\n",pixels->width,pixels->heigth);
 	fprintf(arquivo, "%d\n",pixels->color);
 	
 	for(i=0;i!=pixels->heigth;i++){
@@ -191,3 +223,15 @@ void Export(char *nome, Imagem *pixels){
 	return;
 }
 
+void Line(int *dados, Imagem *pixels){
+	
+	int x1,x2,y1,y2,color;
+	
+	x1 = dados[0];
+	y1 = dados[1];
+	x2 = dados[3];
+	y2 = dados[4];	
+	color = dados[5];
+	
+	
+}
