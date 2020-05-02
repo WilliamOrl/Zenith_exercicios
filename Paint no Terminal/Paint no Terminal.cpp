@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h> 
 #include <string.h>  
-
+#include <math.h>
 
 typedef struct{						//Elementos nescessarios para a criação de uma imagem tipo PGM
 	char magic_number[3];
@@ -17,7 +17,8 @@ typedef struct{						//Elementos nescessarios para a criação de uma imagem tipo 
 int Comandos(int *retorno,char *nome);					//Le os comandos digitados
 void Create(int *dimensoes,Imagem *pixels);				//Cria a imagem PGM
 void Export(char *nome, Imagem *pixels);				//Salva a imagem
-void Line(int *dados, Imagem *pixels);		//Cria uma linha
+void Line(int *dados, Imagem *pixels);					//Cria uma linha
+void Circle(int *dados, Imagem *pixels);				//Cria uma Circulo
 
 int main(void){
 	Imagem pixels;
@@ -29,23 +30,23 @@ int main(void){
 		aux = Comandos(cmdint,cmdchar);
 		switch(aux){
 			
-			case 1:
-			Create(cmdint,&pixels);
+			case 1:						//CREATE
+				Create(cmdint,&pixels);
 				break;
 			
 			
-			case 2:
-			Export(cmdchar,&pixels);
+			case 2:						//EXPORT
+				Export(cmdchar,&pixels);
 				break;
 			
 			
-			case 3:
-			Line(cmdint,&pixels);
+			case 3:						//LINE
+				Line(cmdint,&pixels);
 				break;
 			
 			
-			case 4:
-				
+			case 4:						//CIRCLE
+				Circle(cmdint, &pixels);
 				break;
 			
 			
@@ -128,9 +129,18 @@ int Comandos(int *retorno,char *nome){  //Seleciona o comando
 	
 	if(cmd[0] == 'C' && cmd[1] == 'I' && cmd[2] == 'R' && cmd[3] == 'C' && cmd[4] == 'L' && cmd[5] == 'E'){		//CIRCLE
 		
-		for(i=6,j=0;i=30;i++,j++)
-			cmd[i]= retorno[j];
-		
+			for(i=7,j=0;i!=30;i++){
+			if(cmd[i]>=48 && cmd[i]<=57 || cmd[i] == ' ' ){					//48 e 57 são os estremos de 0 a 9 na tabala ASCII
+				if(cmd[i] == ' '){
+					j++;
+				}
+				else{
+					aux = cmd[i] - 48;
+					retorno[j] = retorno[j]*10;	
+					retorno[j] = retorno[j] + aux;
+				}
+			}
+		}	
 		return 4;
 	}
 	
@@ -274,3 +284,68 @@ void Line(int *dados, Imagem *pixels){
 	
 	
 }
+
+
+//=========================================================================
+//								CIRCLE
+//=========================================================================
+void Circle(int *dados, Imagem *pixels){
+	
+	float x1,y1,radius;
+	int color;
+	
+	float disty,distx;
+	int x,y,aux,i,x2;
+	
+	x1 = dados[0];
+	y1 = dados[1];
+	radius = dados[2];	
+	color = dados[3];
+	
+	/*
+	for(i=0;i!=30;i++)
+		printf("vet[%d] = %d\n",i,dados[i]);
+	*/
+	
+	printf("x1 = %f\ny1 = %f\nradius = %f\ncolor = %d\n",x1,y1,radius,color);
+	
+	
+	if( (color>=0 && color<=255) && (x1>=0 && x1<=pixels->width) && (y1>=0 && y1<=pixels->heigth) ){
+		for(x=x1;x!=radius + x1; x++){
+			distx = x - x1;
+			disty = sqrt( (radius*radius) - (distx*distx) );
+			y = disty + y1;
+			if(x>=0 && x<=pixels->width && y>=0 && y<=pixels->heigth)
+				pixels->imagem[y][x] = color;
+		}
+	
+		for( x = radius; x!= 0; x--){
+			x2 = x+x1;
+			disty = sqrt( (radius*radius) - (x*x) );
+			y =  disty + y;
+			if(x>=0 && x<=pixels->width && y>=0 && y<=pixels->heigth)
+				pixels->imagem[y][x2] = color;
+		}
+	
+		for( x = x1+radius ; x!= x1; x--){
+			distx = x - x1;
+			disty = sqrt( (radius*radius) - (distx*distx) );
+			y = disty -  y1;
+			if(x>=0 && x<=pixels->width && y>=0 && y<=pixels->heigth)
+				pixels->imagem[y][x] = color;
+		}
+		
+		
+		for(x=x1;x!=radius + x1; x++){
+			distx = x - x1;
+			disty = sqrt( (radius*radius) - (distx*distx) );
+			y = y1 - disty;
+			if(x>=0 && x<=pixels->width && y>=0 && y<=pixels->heigth)
+				pixels->imagem[y][x] = color;
+		}
+
+	}else 
+		printf("ERRO!\n");
+		return;	
+}
+
