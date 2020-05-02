@@ -3,31 +3,38 @@
 #include <stdio.h>
 #include <stdlib.h> 
 #include <string.h>  
-#define SUCESSO 1
-#define ERRO -1
 
-int Comandos(int *retorno,char *nome, int *info);					//Le o comando digitado
-void Create(int *dimensoes,char *nome, int *info);			//Cria a imagem PBM
 
+typedef struct{
+	char magic_number[3];
+	int heigth;
+	int width;
+	int color;
+	int **imagem;
+}Imagem;
+
+
+int Comandos(int *retorno,char *nome);					//Le o comando digitado
+void Create(int *dimensoes,Imagem *pixels);				//Cria a imagem PBM
+void Export(char *nome, Imagem *pixels);				//Salva a imagem
 
 int main(void){
+	Imagem pixels;
 	int cmdint[30];
 	char cmdchar[30];
-	int aux,info;
-	cmdchar[30] = NULL;
-	info = 0;
+	int aux;
 	
 	while(1){
-		aux = Comandos(cmdint,cmdchar,&info);
+		aux = Comandos(cmdint,cmdchar);
 		switch(aux){
 			
 			case 1:
-			Create(cmdint,cmdchar,&info);
+			Create(cmdint,&pixels);
 				break;
 			
 			
 			case 2:
-			
+			Export(cmdchar,&pixels);
 				break;
 			
 			
@@ -54,21 +61,17 @@ int main(void){
 }
 
 
-int Comandos(int *retorno,char *nome, int *info){  //Seleciona o comando
+int Comandos(int *retorno,char *nome){  //Seleciona o comando
 	
 	int i,j,aux;
 	char cmd[30];
 	int caracter;
 	
-	
-//	for(i=0;i!=30;i++)
-//		cmd[i] = ' ';
-	
-	
+		
 	printf("Digite o Comando: ");
 	scanf("%[^\n]s",&cmd);
 	setbuf(stdin, NULL);
-	//printf("\n");
+
 		
 
 	if(cmd[0] == 'C' && cmd[1] == 'R' && cmd[2] == 'E' && cmd[3] == 'A' && cmd[4] == 'T' && cmd[5] == 'E'){		//CREATE
@@ -84,12 +87,10 @@ int Comandos(int *retorno,char *nome, int *info){  //Seleciona o comando
 	
 	if(cmd[0] == 'E' && cmd[1] == 'X' && cmd[2] == 'P' && cmd[3] == 'O' && cmd[4] == 'R' && cmd[5] == 'T'){		//EXPORT
 
-		for(i=7,j=0;i!=30;i++){
-			cmd[i] = nome[j];
-			j++;
+		for(i=7,j=0;i!=30;i++,j++){
+			nome[j] = cmd[i]; 
 		}
-		strcat (nome, ".pgm");
-		*info = 1;
+		
 		return 2;
 	}
 	
@@ -127,12 +128,12 @@ int Comandos(int *retorno,char *nome, int *info){  //Seleciona o comando
 	}
 }
 
-void Create(int *dimensoes,char *nome, int *info){		//Cria a imagem PGM
+void Create(int *dimensoes,Imagem *pixels){		//Cria a imagem PGM
 	
-	int aux,i,j,branco = 255;
+	int i,j,aux;
 	int width=0,heigth=0;
-	char nomeinterno[30];
-
+	
+	printf("Criando Imagem...\n");
 	
 	for(i=0,aux=100;i!=3;i++){
 		width = width + dimensoes[i]*aux;
@@ -145,30 +146,48 @@ void Create(int *dimensoes,char *nome, int *info){		//Cria a imagem PGM
 	}
 	
 	
-	if(*info == 0){
-		printf("Selecione um nome para a imagem: ");
-		scanf("%[^\n]s",nome);
-		setbuf(stdin, NULL);
-		strcat (nome, ".pgm");
+	if(heigth>width){
+		printf("ERRO!\n");
+		return;
 	}
+	
+	
+	pixels->magic_number[0] = 'P';
+	pixels->magic_number[1] = '2';
+	pixels->magic_number[2] = '\0';
 
-	printf("%s\n",nome);
+	pixels->width = width;
+	pixels->heigth = heigth;
+
+	pixels->imagem = (int **) calloc (width, sizeof(int *));
+        for (int i = 0; i < heigth; i++){
+            pixels->imagem[i] = (int *) calloc (width, sizeof(int));
+        }
+		
+
+	return;
+}
+
+void Export(char *nome, Imagem *pixels){
+
+	int i,j;
+	
+	strcat (nome, ".pgm");
 	
 	FILE *arquivo = fopen (nome,"w");
 
-	fprintf(arquivo, "P2\n");
-    fprintf(arquivo, "%d %d\n",heigth,width);
-	fprintf(arquivo, "255\n");
+	fprintf(arquivo,"%s\n",pixels->magic_number);
+    fprintf(arquivo, "%d %d\n",pixels->heigth,pixels->width);
+	fprintf(arquivo, "%d\n",pixels->color);
 	
-	for(i=0;i!=heigth;i++){
-		for(j=0;j!=width;j++){
-			fprintf(arquivo,"255");
+	for(i=0;i!=pixels->heigth;i++){
+		for(j=0;j!=pixels->width;j++){
+			fprintf(arquivo,"%d",pixels->imagem[i][j]);
 		}
 		fprintf(arquivo,"\n");
 	}
 
 	fclose(arquivo);
-
-	printf("width = %d\nheigth = %d\n",width,heigth);
 	return;
 }
+
