@@ -19,6 +19,8 @@ void Create(int *dimensoes,Imagem *pixels);				//Cria a imagem PGM
 void Export(char *nome, Imagem *pixels);				//Salva a imagem
 void Line(int *dados, Imagem *pixels);					//Cria uma linha
 void Circle(int *dados, Imagem *pixels);				//Cria uma Circulo
+void Disk(int *dados, Imagem *pixels);					//Cria um Disco
+void Rect(int *dados, Imagem *pixels);					//Cria um Retangulo
 
 int main(void){
 	Imagem pixels;
@@ -50,12 +52,12 @@ int main(void){
 				break;
 			
 			
-			case 5:
-				
+			case 5:						//DISK
+				Disk(cmdint, &pixels);
 				break;
 			
-			case 6:
-				
+			case 6:						//RECT
+				Rect(cmdint, &pixels);
 				break;
 			
 		}	
@@ -146,17 +148,35 @@ int Comandos(int *retorno,char *nome){  //Seleciona o comando
 	
 	if(cmd[0] == 'D' && cmd[1] == 'I' && cmd[2] == 'S' && cmd[3] == 'K'){		//DISK
 		
-		for(i=4,j=0;i=30;i++,j++)
-			cmd[i]= retorno[j];
-		
+			for(i=5,j=0;i!=30;i++){
+			if(cmd[i]>=48 && cmd[i]<=57 || cmd[i] == ' ' ){					//48 e 57 são os estremos de 0 a 9 na tabala ASCII
+				if(cmd[i] == ' '){
+					j++;
+				}
+				else{
+					aux = cmd[i] - 48;
+					retorno[j] = retorno[j]*10;	
+					retorno[j] = retorno[j] + aux;
+				}
+			}
+		}
 		return 5;
 	}
 	
 	if(cmd[0] == 'R' && cmd[1] == 'E' && cmd[2] == 'C' && cmd[3] == 'T'){		//RECT
 		
-		for(i=4,j=0;i=30;i++,j++)
-			cmd[i]= retorno[j];
-		
+			for(i=5,j=0;i!=30;i++){
+			if(cmd[i]>=48 && cmd[i]<=57 || cmd[i] == ' ' ){					//48 e 57 são os estremos de 0 a 9 na tabala ASCII
+				if(cmd[i] == ' '){
+					j++;
+				}
+				else{
+					aux = cmd[i] - 48;
+					retorno[j] = retorno[j]*10;	
+					retorno[j] = retorno[j] + aux;
+				}
+			}
+		}
 		return 6;
 	}
 }
@@ -294,8 +314,8 @@ void Circle(int *dados, Imagem *pixels){
 	float x1,y1,radius;
 	int color;
 	
-	float disty,distx;
-	int x,y,aux,i,x2;
+	int x,y;
+	float r2,x2,y2,aux;
 	
 	x1 = dados[0];
 	y1 = dados[1];
@@ -307,45 +327,171 @@ void Circle(int *dados, Imagem *pixels){
 		printf("vet[%d] = %d\n",i,dados[i]);
 	*/
 	
-	printf("x1 = %f\ny1 = %f\nradius = %f\ncolor = %d\n",x1,y1,radius,color);
+	printf("Desenhando o Circulo...\n");
 	
 	
 	if( (color>=0 && color<=255) && (x1>=0 && x1<=pixels->width) && (y1>=0 && y1<=pixels->heigth) ){
-		for(x=x1;x!=radius + x1; x++){
-			distx = x - x1;
-			disty = sqrt( (radius*radius) - (distx*distx) );
-			y = disty + y1;
-			if(x>=0 && x<=pixels->width && y>=0 && y<=pixels->heigth)
-				pixels->imagem[y][x] = color;
-		}
-	
-		for( x = radius; x!= 0; x--){
-			x2 = x+x1;
-			disty = sqrt( (radius*radius) - (x*x) );
-			y =  disty + y;
-			if(x>=0 && x<=pixels->width && y>=0 && y<=pixels->heigth)
-				pixels->imagem[y][x2] = color;
-		}
-	
-		for( x = x1+radius ; x!= x1; x--){
-			distx = x - x1;
-			disty = sqrt( (radius*radius) - (distx*distx) );
-			y = disty -  y1;
-			if(x>=0 && x<=pixels->width && y>=0 && y<=pixels->heigth)
-				pixels->imagem[y][x] = color;
-		}
 		
-		
-		for(x=x1;x!=radius + x1; x++){
-			distx = x - x1;
-			disty = sqrt( (radius*radius) - (distx*distx) );
-			y = y1 - disty;
-			if(x>=0 && x<=pixels->width && y>=0 && y<=pixels->heigth)
+		for(x=x1-radius;x<=x1+radius;x++){
+			
+			x2=  pow(x-x1,2);
+			r2 = radius*radius;
+			y2 = y1*y1;
+	
+			aux = sqrt(r2-x2);
+			y= y1 + aux;
+			
+			if(x>=0 && x<=pixels->width && y>=0 && y<=pixels->heigth){
 				pixels->imagem[y][x] = color;
+			}
+			
+			aux = sqrt(r2-x2);
+			y = y1 - aux;
+			if(x>=0 && x<=pixels->width && y>=0 && y<=pixels->heigth){
+				pixels->imagem[y][x] = color;		
+			}
+		
 		}
-
+	return;
 	}else 
 		printf("ERRO!\n");
 		return;	
+}
+
+//=========================================================================
+//								DISK
+//=========================================================================
+void Disk(int *dados, Imagem *pixels){
+		
+	float x1,y1,radius;
+	int color;
+	
+	int x,y,x_cont,ysec,y_cont;
+	float r2,x2,y2,aux;
+	
+	x1 = dados[0];
+	y1 = dados[1];
+	radius = dados[2];	
+	color = dados[3];
+	
+	printf("Desenhando o Disco...\n");
+	
+	if( (color>=0 && color<=255) && (x1>=0 && x1<=pixels->width) && (y1>=0 && y1<=pixels->heigth) ){
+		for(x=x1-radius;x<=x1+radius;x++){
+			
+			x2=  pow(x-x1,2);
+			r2 = radius*radius;
+			y2 = y1*y1;
+	
+			
+			if(x<x1){
+			
+				aux = sqrt(r2-x2);
+				y= y1 + aux;
+				
+				for(x_cont=x;x_cont<=x1;x_cont++)
+					if(x_cont>=0 && x_cont<=pixels->width && y>=0 && y<=pixels->heigth){
+						pixels->imagem[y][x_cont] = color;
+					}
+				
+				aux = sqrt(r2-x2);
+				ysec = y1 - aux;
+				
+				for(x_cont=x;x_cont<=x1;x_cont++)
+					if(x_cont>=0 && x_cont<=pixels->width && y>=0 && y<=pixels->heigth){
+						pixels->imagem[ysec][x_cont] = color;
+					}	
+				
+			
+				for(y_cont=ysec;y_cont<=y;y_cont++)
+					if(x_cont>=0 && x_cont<=pixels->width && y>=0 && y<=pixels->heigth){
+						pixels->imagem[y_cont][x] = color;
+					}
+			}
+			
+			if(x>=x1){
+				aux = sqrt(r2-x2);
+				y= y1 + aux;
+	
+				for(x_cont=x1;x_cont<=x;x_cont++)
+					if(x_cont>=0 && x_cont<=pixels->width && y>=0 && y<=pixels->heigth){
+						pixels->imagem[y][x_cont] = color;
+					}
+				
+				aux = sqrt(r2-x2);
+				ysec = y1 - aux;
+				
+				for(x_cont=x1;x_cont<=x;x_cont++)
+					if(x_cont>=0 && x_cont<=pixels->width && y>=0 && y<=pixels->heigth){
+						pixels->imagem[ysec][x_cont] = color;
+					}
+			
+				for(y_cont=ysec;y_cont<=y;y_cont++)
+					if(x_cont>=0 && x_cont<=pixels->width && y>=0 && y<=pixels->heigth){
+						pixels->imagem[y_cont][x] = color;
+					}	
+			}
+		}
+	return;
+	}else 
+		printf("ERRO!\n");
+		return;		
+}
+
+
+
+//=========================================================================
+//								RECT
+//=========================================================================
+
+void Rect(int *dados, Imagem *pixels){
+	
+	int x1,y1,width,heigth,color;
+	int aux,aux2;
+	int x,y;
+	
+	x1 = dados[0];
+	y1 = dados[1];
+	width = dados[2];	
+	heigth = dados[3];
+	color = dados[4];
+	
+	printf("Desenhando o Retangulo...\n");
+	
+	if( (color>=0 && color<=255) && (x1>=0 && x1<=pixels->width) && (y1>=0 && y1<=pixels->heigth) ){
+	aux = heigth/2;
+	aux2 = width/2;
+	
+	y = y1-aux;
+	x = x1-aux2;
+	for(;x!=x1+aux;x++)
+		if(x>=0 && x<=pixels->width && y>=0 && y<=pixels->heigth){
+				pixels->imagem[y][x] = color;		
+		}
+	
+	y = y1+aux;
+	x = x1-aux2;	
+	for(;x!=x1+aux;x++)
+		if(x>=0 && x<=pixels->width && y>=0 && y<=pixels->heigth){
+				pixels->imagem[y][x] = color;		
+		}
+	
+	y = y1-aux;
+	x = x1-aux2;
+	for(;y!=y1+aux;y++)
+		if(x>=0 && x<=pixels->width && y>=0 && y<=pixels->heigth){
+				pixels->imagem[y][x] = color;		
+		}
+	
+	y = y1-aux;
+	x = x1+aux2;
+	for(;y!=y1+aux;y++)
+		if(x>=0 && x<=pixels->width && y>=0 && y<=pixels->heigth){
+				pixels->imagem[y][x] = color;		
+		}
+	return;
+	}else 
+		printf("ERRO!\n");
+		return;
 }
 
